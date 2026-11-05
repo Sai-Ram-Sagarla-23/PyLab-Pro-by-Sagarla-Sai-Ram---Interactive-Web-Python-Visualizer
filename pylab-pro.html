@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PyLab Pro – Python Compiler, Problems & Visualizer</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1c2233;--mut:#6b7490;--line:#e2e6f0;--acc:#5b5ff5;--acc2:#8b5cf6;--ok:#16a34a;--bad:#dc2626;--warn:#d97706;--code:#0f1420;--codeink:#e6e9f5;--hl:#fde68a;--chg:#dcfce7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0f1a;--card:#141a2b;--ink:#e6e9f5;--mut:#8b94b3;--line:#232b42;--hl:#4a3f10;--chg:#12361f}}
+:root[data-theme="dark"]{--bg:#0b0f1a;--card:#141a2b;--ink:#e6e9f5;--mut:#8b94b3;--line:#232b42;--hl:#4a3f10;--chg:#12361f}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.logo{font-weight:800;font-size:20px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+header .sp{flex:1}.tag{color:var(--mut);font-size:13px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;border-radius:9px;transition:.15s}
+button:hover{border-color:var(--acc)}button:disabled{opacity:.5;cursor:default}
+.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:0;font-weight:600}
+.ok{background:var(--ok);color:#fff;border:0;font-weight:600}.sm{padding:4px 10px;font-size:13px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:16px;padding:16px 20px;max-width:1700px;margin:auto}
+@media(max-width:860px){.layout{grid-template-columns:1fr;padding:12px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.side h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
+.item{padding:9px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.item:hover{background:var(--bg)}.item.on{background:var(--bg);border-color:var(--acc)}
+.item b{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
+.Easy{background:#dcfce7;color:#166534}.Medium{background:#fef3c7;color:#92400e}.Hard{background:#fee2e2;color:#991b1b}
+.done{color:var(--ok);font-weight:700}
+.main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.prob h2{margin:0 0 6px;font-size:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.prob p{margin:6px 0;white-space:pre-wrap;color:var(--mut)}
+.io{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.io div{flex:1;min-width:140px}.io small{color:var(--mut);display:block;font-size:12px}
+pre,.mono,textarea.code{font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;white-space:pre-wrap;word-break:break-word}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.bar .sp{flex:1}
+.ed{display:flex;background:var(--code);border-radius:10px;overflow:hidden;height:380px}
+.gut{padding:10px 8px;color:#5d6788;text-align:right;user-select:none;overflow:hidden;min-width:42px;background:#0b0f19;white-space:pre}
+textarea.code{flex:1;background:transparent;color:var(--codeink);border:0;outline:0;resize:none;padding:10px;white-space:pre;overflow:auto;tab-size:4}
+.gut{font:13.5px/1.55 ui-monospace,Menlo,Consolas,monospace}
+.stdin{width:100%;margin-top:8px;min-height:46px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:8px;font:13px ui-monospace,Menlo,monospace;resize:vertical}
+.tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.tab{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 14px;color:var(--mut)}
+.tab.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+.out{background:var(--code);color:var(--codeink);border-radius:10px;padding:12px;min-height:120px;max-height:320px;overflow:auto;white-space:pre-wrap;font:13.5px/1.5 ui-monospace,Menlo,monospace}
+.out .err{color:#ff8a8a}.out .dim{color:#7d87a8}
+.test{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
+.test.p{border-left:4px solid var(--ok)}.test.f{border-left:4px solid var(--bad)}
+.test .h{font-weight:600;display:flex;justify-content:space-between}
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.work>.card{display:flex;flex-direction:column;min-width:0}
+@media(max-width:1000px){.work{grid-template-columns:1fr}}
+#out{min-height:0;max-height:none;height:440px}
+#tests,#p-viz{max-height:490px;overflow:auto}
+.prob p{max-height:90px;overflow:auto}
+.vz{display:grid;grid-template-columns:1fr;gap:12px}
+.vcode{max-height:200px}
+.vcode{background:var(--code);color:var(--codeink);border-radius:10px;padding:8px 0;max-height:360px;overflow:auto;font:13.5px/1.5 ui-monospace,Menlo,monospace}
+.vl{display:flex;white-space:pre;padding:0 10px}.vl i{color:#5d6788;min-width:34px;font-style:normal;user-select:none}
+.vl.cur{background:#4a3f10;color:#fff}.vl.cur i{color:#fbbf24}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600}td.v{font-family:ui-monospace,Menlo,monospace;word-break:break-all}tr.chg td{background:var(--chg)}
+.ctl{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}.ctl input[type=range]{flex:1;min-width:120px}
+.mut{color:var(--mut)}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:20px;width:min(640px,94vw);max-height:90vh}
+dialog::backdrop{background:rgba(5,8,18,.6)}
+label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}
+input[type=text],select,.fld{width:100%;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);padding:8px 10px;font:inherit}
+.fld.mono{font:13px ui-monospace,Menlo,monospace}
+.trow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:6px}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">🐍 PyLab</span><span class="tag">Real CPython · numpy · pandas · matplotlib · any pip package</span>
+  <span class="sp"></span><span class="badge Medium" id="status">⏳ Python not loaded</span>
+  <button class="sm" id="theme">🌓 Theme</button>
+</header>
+
+<div class="layout">
+  <aside class="card side" style="align-self:start">
+    <h3>Problems <button class="sm pri" id="addBtn">+ Add</button></h3>
+    <div id="list"></div>
+  </aside>
+
+  <section class="main">
+    <div class="card prob" id="prob"></div>
+
+    <div class="work">
+    <div class="card">
+      <div class="bar">
+        <button class="pri" id="run">▶ Run</button>
+        <button class="ok" id="test">✔ Run tests</button>
+        <button id="viz" style="border-color:var(--acc2);color:var(--acc2)">👁 Visualize</button>
+        <button id="reset" class="sm">↺ Reset code</button>
+        <span class="sp"></span><span class="mut" style="font-size:12px">Ctrl/⌘ + Enter to run</span>
+      </div>
+      <div class="ed"><div class="gut" id="gut"></div><textarea class="code" id="code" spellcheck="false" autocapitalize="off"></textarea></div>
+      <textarea class="stdin" id="stdin" placeholder="Input for input() — one value per line (optional)"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab on" data-t="out">Output</button>
+        <button class="tab" data-t="tests">Test results</button>
+        <button class="tab" data-t="viz">Visualizer</button>
+      </div>
+      <div id="p-out"><div class="out" id="out"><span class="dim">Press Run to execute your code…</span></div></div>
+      <div id="p-tests" hidden><div id="tests" class="mut">Open a problem and press “Run tests”.</div></div>
+      <div id="p-viz" hidden>
+        <div id="vempty" class="mut">Press “Visualize” to step through your code line by line and watch variables change.</div>
+        <div id="vbody" hidden>
+          <div class="ctl">
+            <button class="sm" id="first">⏮</button><button class="sm" id="prev">◀ Prev</button>
+            <button class="sm pri" id="play">▶ Play</button>
+            <button class="sm" id="next">Next ▶</button><button class="sm" id="last">⏭</button>
+            <input type="range" id="slider" min="0" max="0" value="0"><span class="mut" id="stepno"></span>
+          </div>
+          <div class="vz">
+            <div><div class="mut" style="font-size:12px;margin-bottom:4px">CODE (current line highlighted)</div><div class="vcode" id="vcode"></div></div>
+            <div>
+              <div class="mut" style="font-size:12px;margin-bottom:4px" id="scopeLbl">VARIABLES</div>
+              <table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody id="vars"></tbody></table>
+              <div class="mut" style="font-size:12px;margin:12px 0 4px">OUTPUT SO FAR</div>
+              <div class="out" id="vout" style="min-height:60px;max-height:150px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <h2 style="margin:0 0 4px" id="dTitle">Add a problem</h2>
+  <label>Title</label><input type="text" id="fTitle" placeholder="e.g. Count vowels">
+  <label>Difficulty</label><select id="fDiff"><option>Easy</option><option>Medium</option><option>Hard</option></select>
+  <label>Description</label><textarea class="fld" id="fDesc" rows="4" placeholder="Describe the problem, input and output format…"></textarea>
+  <label>Starter code (optional)</label><textarea class="fld mono" id="fStart" rows="3" placeholder="# your code here"></textarea>
+  <label>Test cases (input → expected output)</label>
+  <div id="fTests"></div>
+  <button class="sm" id="addT" type="button">+ Add test case</button>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+    <button id="dDel" class="sm" style="color:var(--bad);margin-right:auto" hidden>Delete</button>
+    <button id="dCancel">Cancel</button><button class="pri" id="dSave">Save problem</button>
+  </div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* ---------- Data ---------- */
+const SEED=[
+ {id:'p1',title:'Sum of two numbers',diff:'Easy',desc:'Read two integers from one line (space separated) and print their sum.',starter:'a, b = map(int, input().split())\n# print the sum\n',tests:[{i:'3 5',o:'8'},{i:'-2 10',o:'8'},{i:'100 250',o:'350'}]},
+ {id:'p2',title:'FizzBuzz',diff:'Easy',desc:'Read n. For each number from 1 to n print "Fizz" if divisible by 3, "Buzz" if divisible by 5, "FizzBuzz" if both, otherwise the number. One per line.',starter:'n = int(input())\n',tests:[{i:'5',o:'1\n2\nFizz\n4\nBuzz'},{i:'15',o:'1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz'}]},
+ {id:'p3',title:'Palindrome check',diff:'Medium',desc:'Read a word. Print YES if it reads the same backwards (ignore case), otherwise NO.',starter:'s = input()\n',tests:[{i:'Level',o:'YES'},{i:'python',o:'NO'},{i:'Racecar',o:'YES'}]}
+];
+let problems=[],cur='free',codes={};
+try{problems=JSON.parse(store.get('pylab-problems')||'null')||SEED}catch(e){problems=SEED}
+try{codes=JSON.parse(store.get('pylab-codes')||'{}')}catch(e){codes={}}
+let solved={};try{solved=JSON.parse(store.get('pylab-solved')||'{}')}catch(e){}
+const saveAll=()=>{store.set('pylab-problems',JSON.stringify(problems));store.set('pylab-codes',JSON.stringify(codes));store.set('pylab-solved',JSON.stringify(solved))};
+const FREE='# Free playground – write anything!\nname = "PyLab"\ntotal = 0\nfor i in range(1, 4):\n    total += i\n    print(i, total)\nprint("Hello,", name, total)\n';
+const P=()=>problems.find(p=>p.id===cur);
+
+/* ---------- Sidebar & problem view ---------- */
+function renderList(){
+  $('list').innerHTML='<div class="item '+(cur==='free'?'on':'')+'" data-id="free"><b>🧪 Playground</b></div>'+
+   problems.map(p=>'<div class="item '+(cur===p.id?'on':'')+'" data-id="'+p.id+'"><b>'+(solved[p.id]?'<span class="done">✓</span> ':'')+esc(p.title)+'</b><span class="badge '+p.diff+'">'+p.diff+'</span></div>').join('');
+  document.querySelectorAll('.item').forEach(e=>e.onclick=()=>select(e.dataset.id));
+}
+function select(id){
+  cur=id;const p=P();
+  $('code').value=codes[id]??(p?p.starter||'# write your solution\n':FREE);
+  const pv=$('prob');
+  if(!p){pv.innerHTML='<h2>🧪 Playground</h2><p>A free space to write and run Python. Add your own problems with the “+ Add” button on the left, then solve them here.</p>'}
+  else{pv.innerHTML='<h2>'+esc(p.title)+' <span class="badge '+p.diff+'">'+p.diff+'</span><button class="sm" id="editP" style="margin-left:auto">✎ Edit</button></h2><p>'+esc(p.desc)+'</p><div class="io"><div><small>Example input</small><pre>'+esc(p.tests[0]?.i??'')+'</pre></div><div><small>Example output</small><pre>'+esc(p.tests[0]?.o??'')+'</pre></div></div>';
+    $('editP').onclick=()=>openForm(p)}
+  $('stdin').value=p?.tests[0]?.i??'';
+  renderList();gutter();
+}
+function gutter(){const n=$('code').value.split('\n').length;$('gut').textContent=Array.from({length:n},(_,i)=>i+1).join('\n')}
+$('code').addEventListener('input',()=>{gutter();codes[cur]=$('code').value;saveAll()});
+$('code').addEventListener('scroll',()=>$('gut').scrollTop=$('code').scrollTop);
+$('code').addEventListener('keydown',e=>{
+  if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart;t.setRangeText('    ',s,t.selectionEnd,'end');t.dispatchEvent(new Event('input'))}
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();doRun()}
+  else if(e.key==='Enter'){const t=e.target,v=t.value,s=t.selectionStart,ls=v.lastIndexOf('\n',s-1)+1,line=v.slice(ls,s);
+    let ind=line.match(/^ */)[0];if(/:\s*$/.test(line))ind+='    ';e.preventDefault();t.setRangeText('\n'+ind,s,t.selectionEnd,'end');t.dispatchEvent(new Event('input'))}
+});
+$('reset').onclick=()=>{const p=P();delete codes[cur];saveAll();select(cur)};
+
+
+const HARNESS=`
+import sys, io, json, traceback, base64, types, os
+os.environ["MPLBACKEND"]="AGG"
+def __pylab_run(code, stdin, trace):
+    out=io.StringIO(); steps=[]; err=None; imgs=[]
+    so,se,si=sys.stdout,sys.stderr,sys.stdin
+    sys.stdout=out; sys.stderr=out; sys.stdin=io.StringIO(stdin)
+    g={"__name__":"__main__"}
+    skip=(types.ModuleType,types.FunctionType,type,types.BuiltinFunctionType)
+    def fmt(f):
+        r=[]
+        for k,v in list(f.f_locals.items()):
+            if k.startswith("__") or isinstance(v,skip): continue
+            try: r.append([k,repr(v)[:80]])
+            except Exception: r.append([k,"<unprintable>"])
+        return r
+    def tracer(frame,event,arg):
+        if frame.f_code.co_filename!="<viz>": return None
+        if event=="line":
+            if len(steps)>=1500: raise RuntimeError("Visualizer stopped: more than 1500 steps")
+            steps.append([frame.f_lineno,frame.f_code.co_name,fmt(frame),out.getvalue()])
+        return tracer
+    try:
+        c=compile(code,"<viz>","exec")
+        if trace: sys.settrace(tracer)
+        try: exec(c,g)
+        finally: sys.settrace(None)
+    except BaseException as e:
+        ln=getattr(e,"lineno",None) if isinstance(e,SyntaxError) else None
+        for fr in traceback.extract_tb(e.__traceback__):
+            if fr.filename=="<viz>": ln=fr.lineno
+        err=(("Line %s: "%ln) if ln else "")+"".join(traceback.format_exception_only(type(e),e)).strip()
+    finally:
+        sys.stdout,sys.stderr,sys.stdin=so,se,si
+    try:
+        if "matplotlib.pyplot" in sys.modules:
+            plt=sys.modules["matplotlib.pyplot"]
+            for n in plt.get_fignums():
+                b=io.BytesIO(); plt.figure(n).savefig(b,format="png",bbox_inches="tight"); imgs.append(base64.b64encode(b.getvalue()).decode())
+            plt.close("all")
+    except Exception: pass
+    return json.dumps({"out":out.getvalue(),"err":err,"steps":steps,"imgs":imgs})
+`;
+let py=null,pyLoading=null;
+const setStatus=(t,c)=>{const s=$('status');s.textContent=t;s.className='badge '+(c||'Medium')};
+function ensurePy(){
+  if(py)return Promise.resolve(py);
+  if(typeof loadPyodide==='undefined')return Promise.reject('Could not load Pyodide. Open this file with an internet connection (not from a restricted sandbox).');
+  if(!pyLoading){setStatus('⏳ Loading Python…');pyLoading=loadPyodide().then(p=>{p.runPython(HARNESS);py=p;setStatus('● Python ready','Easy');return p}).catch(e=>{setStatus('✘ Python failed','Hard');throw e})}
+  return pyLoading;
+}
+async function execPy(code,stdin,trace){
+  let p;try{p=await ensurePy()}catch(e){return{out:'',err:String(e),steps:[],imgs:[]}}
+  const tried=new Set();let r;
+  for(let k=0;k<6;k++){
+    try{setStatus('⏳ Loading packages…');await p.loadPackagesFromImports(code)}catch(e){}
+    setStatus('⏳ Running…');
+    r=JSON.parse(p.globals.get('__pylab_run')(code,stdin||'',!!trace));
+    const m=r.err&&r.err.match(/No module named '([\w]+)/);
+    if(!m||tried.has(m[1]))break;
+    tried.add(m[1]);setStatus('⏳ pip install '+m[1]+'…');
+    try{await p.loadPackage('micropip');await p.pyimport('micropip').install(m[1])}catch(e){r.err+='\n(pip could not install "'+m[1]+'" – it may need native code that browsers cannot run)';break}
+  }
+  setStatus('● Python ready','Easy');return r;
+}
+const runPy=(c,s)=>execPy(c,s,false),runQuiet=(c,s)=>execPy(c,s,false);
+const imgHtml=r=>(r.imgs||[]).map(b=>'<img src="data:image/png;base64,'+b+'" style="max-width:100%;background:#fff;border-radius:8px;margin-top:8px;display:block">').join('');
+
+function show(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));['out','tests','viz'].forEach(k=>$('p-'+k).hidden=k!==t)}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.t));
+const busy=f=>['run','test','viz'].forEach(k=>$(k).disabled=f);
+
+async function doRun(){
+  show('out');busy(true);$('out').innerHTML='<span class="dim">Running… (first run loads Python, about 10 seconds)</span>';
+  const r=await execPy($('code').value,$('stdin').value,false);
+  $('out').innerHTML=esc(r.out)+(r.err?'<span class="err">\n'+esc(r.err)+'</span>':(r.out||r.imgs.length?'':'<span class="dim">(no output)</span>'))+imgHtml(r);
+  busy(false);
+}
+$('run').onclick=doRun;
+
+const norm=s=>s.replace(/\r/g,'').split('\n').map(l=>l.trimEnd()).join('\n').trim();
+$('test').onclick=async()=>{
+  const p=P();show('tests');
+  if(!p){$('tests').innerHTML='<span class="mut">Select a problem first – the playground has no test cases.</span>';return}
+  if(!p.tests.length){$('tests').innerHTML='<span class="mut">This problem has no test cases. Edit it to add some.</span>';return}
+  busy(true);$('tests').innerHTML='<span class="mut">Running tests…</span>';
+  let html='',pass=0;
+  for(let i=0;i<p.tests.length;i++){
+    const t=p.tests[i],r=await runQuiet($('code').value,t.i),ok=!r.err&&norm(r.out)===norm(t.o);if(ok)pass++;
+    html+='<div class="test '+(ok?'p':'f')+'"><div class="h"><span>Test '+(i+1)+'</span><span style="color:var(--'+(ok?'ok':'bad')+')">'+(ok?'✔ Passed':'✘ Failed')+'</span></div>'+
+     '<small class="mut">Input</small><pre>'+esc(t.i)+'</pre><small class="mut">Expected</small><pre>'+esc(t.o)+'</pre>'+(ok?'':'<small class="mut">Your output</small><pre>'+esc(r.out)+(r.err?'\n'+esc(r.err):'')+'</pre>')+'</div>';
+  }
+  const all=pass===p.tests.length;if(all){solved[p.id]=1;saveAll();renderList()}
+  $('tests').innerHTML='<div style="font-weight:700;margin-bottom:10px;color:var(--'+(all?'ok':'warn')+')">'+(all?'🎉 All tests passed! Problem solved.':pass+' / '+p.tests.length+' tests passed')+'</div>'+html;
+  busy(false);
+};
+
+/* ---------- Visualizer (real sys.settrace) ---------- */
+let steps=[],vlines=[],pos=0,timer=null;
+$('viz').onclick=async()=>{
+  show('viz');busy(true);$('vempty').hidden=false;$('vbody').hidden=true;$('vempty').textContent='Tracing your program…';
+  const code=$('code').value,r=await execPy(code,$('stdin').value,true);
+  steps=r.steps.map(s=>({line:s[0],fn:s[1],vars:s[2],out:s[3]}));
+  if(!steps.length&&!r.err){$('vempty').textContent='Nothing to trace – write some code first.';busy(false);return}
+  steps.push({line:null,fn:'',vars:steps.length?steps[steps.length-1].vars:[],out:r.out,end:true,err:r.err});
+  vlines=code.split('\n');pos=0;$('slider').max=steps.length-1;
+  $('vempty').hidden=true;$('vbody').hidden=false;
+  $('vcode').innerHTML=vlines.map((l,i)=>'<div class="vl" id="vl'+(i+1)+'"><i>'+(i+1)+'</i>'+esc(l||' ')+'</div>').join('');
+  draw();busy(false);
+};
+function draw(){
+  const s=steps[pos],pv=pos>0?steps[pos-1]:null;
+  document.querySelectorAll('.vl.cur').forEach(e=>e.classList.remove('cur'));
+  if(s.line){const e=$('vl'+s.line);e.classList.add('cur');const c=$('vcode');if(e.offsetTop<c.scrollTop||e.offsetTop>c.scrollTop+c.clientHeight-40)c.scrollTop=e.offsetTop-80}
+  $('scopeLbl').textContent=s.end?'FINAL VARIABLES':'VARIABLES  ·  '+(s.fn==='<module>'?'global scope':'inside '+s.fn+'()');
+  const old=pv&&pv.fn===s.fn?Object.fromEntries(pv.vars):{};
+  $('vars').innerHTML=s.vars.length?s.vars.map(([k,v])=>'<tr class="'+(old[k]!==v?'chg':'')+'"><td><b>'+esc(k)+'</b></td><td class="v">'+esc(v)+'</td></tr>').join(''):'<tr><td colspan="2" class="mut">No variables yet</td></tr>';
+  $('vout').innerHTML=esc(s.out)+(s.end&&s.err?'<span class="err">\n'+esc(s.err)+'</span>':'');
+  $('stepno').textContent=s.end?'Finished':'Step '+(pos+1)+' / '+(steps.length-1);
+  $('slider').value=pos;$('play').textContent=timer?'⏸ Pause':'▶ Play';
+}
+const go=n=>{pos=Math.max(0,Math.min(steps.length-1,n));draw()};
+const stop=()=>{clearInterval(timer);timer=null};
+$('next').onclick=()=>{stop();go(pos+1)};$('prev').onclick=()=>{stop();go(pos-1)};
+$('first').onclick=()=>{stop();go(0)};$('last').onclick=()=>{stop();go(steps.length-1)};
+$('slider').oninput=e=>{stop();go(+e.target.value)};
+$('play').onclick=()=>{if(timer){stop();draw();return}if(pos>=steps.length-1)pos=0;
+  timer=setInterval(()=>{if(pos>=steps.length-1){stop();draw()}else go(pos+1)},550);draw()};
+
+/* ---------- Add / edit problem ---------- */
+let editing=null;
+function trow(i='',o=''){const d=document.createElement('div');d.className='trow';
+  d.innerHTML='<textarea class="fld mono ti" rows="2" placeholder="Input"></textarea><textarea class="fld mono to" rows="2" placeholder="Expected output"></textarea><button class="sm" type="button" title="Remove">✕</button>';
+  d.children[0].value=i;d.children[1].value=o;d.children[2].onclick=()=>d.remove();$('fTests').appendChild(d)}
+function openForm(p){
+  editing=p||null;$('dTitle').textContent=p?'Edit problem':'Add a problem';
+  $('fTitle').value=p?.title||'';$('fDiff').value=p?.diff||'Easy';$('fDesc').value=p?.desc||'';$('fStart').value=p?.starter||'';
+  $('fTests').innerHTML='';(p?.tests?.length?p.tests:[{i:'',o:''}]).forEach(t=>trow(t.i,t.o));
+  $('dDel').hidden=!p;$('dlg').showModal();
+}
+$('addBtn').onclick=()=>openForm();$('addT').onclick=()=>trow();$('dCancel').onclick=()=>$('dlg').close();
+$('dSave').onclick=()=>{
+  const title=$('fTitle').value.trim();if(!title){$('fTitle').focus();return}
+  const tests=[...document.querySelectorAll('.trow')].map(r=>({i:r.querySelector('.ti').value,o:r.querySelector('.to').value})).filter(t=>t.o.trim()||t.i.trim());
+  const data={title,diff:$('fDiff').value,desc:$('fDesc').value.trim()||'(no description)',starter:$('fStart').value,tests};
+  if(editing){Object.assign(editing,data);delete solved[editing.id]}else{const id='u'+Date.now();problems.push({id,...data});editing={id}}
+  saveAll();$('dlg').close();const id=editing.id;delete codes[id];select(id);
+};
+$('dDel').onclick=()=>{if(!confirm('Delete this problem?'))return;problems=problems.filter(p=>p!==editing);saveAll();$('dlg').close();select('free')};
+$('theme').onclick=()=>{const r=document.documentElement,d=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0b0f1a';r.dataset.theme=d?'light':'dark'};
+
+select('free');
+ensurePy().catch(()=>{});
+</script>
+</body>
+</html>
